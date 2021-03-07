@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FunctionalTicTacToe": {
+      "commandName": "Project",
+      "workingDirectory": "$(OutputDir)"
+    }
+  }
+}
