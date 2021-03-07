@@ -1,8 +1,8 @@
-﻿namespace TicTacToe.BusinessLogic
+﻿namespace TicTacToeGame
 module Game = 
     open GameLogic
     open GameTypes
-    open System
+
     
     // Mutable object holds game state, major use cases and basic display
     type TicTacToeGame() =
@@ -27,8 +27,6 @@ module Game =
         member this.Board =
             game.Board
         
-        member this.StringOutput = 
-            buildGameString game
 
             
         

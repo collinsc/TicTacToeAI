@@ -6,23 +6,20 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath></OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="GameTypes.fs" />
-    <Compile Include="ABPruning.fs" />
-    <Compile Include="GameLogic.fs" />
-    <Compile Include="Game.fs" />
-    <Compile Include="Tests.fs" />
     <Compile Include="ConsoleGame.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="5.0.1" />
+    <ProjectReference Include="..\FunctionalTicTacToe\TicTacToeGame.fsproj" />
   </ItemGroup>
 
-
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="5.0.1" />
+  </ItemGroup>
 
 </Project>

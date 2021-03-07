@@ -1,4 +1,4 @@
-﻿namespace TicTacToe.BusinessLogic
+﻿namespace TicTacToeGame
 
 module GameLogic =
     open System
@@ -128,39 +128,3 @@ module GameLogic =
             let tree = makeABSearchTree game
             let initialData = makeInitialSearchData game
             (doABPruningSearch tree initialData).Value
-
-
-    let buildGameString game = 
-
-        let getCellStr cell =
-            match cell with
-            | Empty -> " "
-            | X -> "X"
-            | O -> "O"
-
-        let getDecoratedCell row col cell =
-            match (row,col) with
-            | (0,2) | (1,2) ->   getCellStr(cell) + "\n-----\n" 
-            | (2,2) -> getCellStr(cell)
-            | (1,_) | (2,_) | (0,_) -> getCellStr(cell) + "|"
-            | _ -> raise(NotImplementedException("???"))
-
-        let getStateStr state = 
-            let getPlayer p =
-                match p with 
-                | XTurn -> "X"
-                | OTurn -> "O"
-            match state with
-                | GameState.FinalState({Turn = t; EndCondition = e}) ->  
-                    match e with 
-                    | Draw -> sprintf "%s forced draw" (getPlayer t)
-                    | _ -> sprintf "%s won by %O" (getPlayer t) e 
-                | GameState.Turn(t)-> sprintf "It's %s's turn" (getPlayer t)
-
-        let buildStrings = Array2D.mapi(fun r c cell -> getDecoratedCell(r)(c)(cell))
-
-        let strSeq = buildStrings(game.Board) |> Seq.cast<string>
-
-        String.Concat(seq { 
-            sprintf "%s\n" (getStateStr game.State)
-            yield! strSeq})

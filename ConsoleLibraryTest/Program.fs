@@ -1,9 +1,7 @@
-﻿namespace TicTacToe.BusinessLogic.ConsoleProgram
+﻿namespace TicTacToeGame.ConsoleGame
 module Main =
     open System
-    open TicTacToe.BusinessLogic.Tests
     open ConsoleGame
-    
     
     
     let LoopUntilQuit prompt processFunc =
@@ -17,7 +15,6 @@ module Main =
     [<EntryPoint>]
     let Main argv =
         match argv with 
-            | [|"Test"|] -> Tests.runAll
             | _ ->
                 let app = ConsoleGame()
                 LoopUntilQuit app.InputPrompt app.ProcessInput

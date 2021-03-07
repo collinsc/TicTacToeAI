@@ -1,9 +1,6 @@
-﻿namespace TicTacToe.BusinessLogic
-
+﻿namespace TicTacToeGame
 
 module ABPruning =
-    open System
-
 
     type ABSearchResult<'T> =
         { Score: int

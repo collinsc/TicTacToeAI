@@ -1,6 +1,5 @@
-﻿namespace TicTacToe.BusinessLogic
+﻿namespace TicTacToeGame
 module GameTypes =
-    open System
     type CellState = 
         | Empty
         | X
@@ -39,18 +38,3 @@ module GameTypes =
         static member Default turn =
             { Board= Array2D.create 3 3 Empty
               State = GameState.Turn(turn)}
-
-
-
-
-
-
-
-
-            
-
-
-
-    
-
-    
