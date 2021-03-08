@@ -1,16 +1,16 @@
-﻿namespace TicTacToeGame.ConsoleGame
+﻿namespace TicTacToe.ConsoleGame
 module ConsoleGame = 
-    open TicTacToeGame
+    open TicTacToe.Game
     open GameTypes
     open System
 
     // processes input & feeds to TicTacToe object
     type ConsoleGame() as this = 
-        let game = Game.TicTacToeGame()
+        let game = Instance(Some(XTurn))
         do 
             printfn "%s" this.BuildGameString
             // first move is randomized so AI might go first, currently O is ai
-            if not(game.State = GameState.Turn(OTurn)) then
+            if game.State = GameState.Turn(OTurn) then
                 game.TakeAITurn()
                 printfn "%s" this.BuildGameString
 
@@ -51,9 +51,10 @@ module ConsoleGame =
                         if not(game.IsOver) then
                             game.TakeAITurn()
                             printfn "%s" this.BuildGameString
-                            not(game.IsOver)
-                        else
-                            not(game.IsOver)
+                            not game.IsOver
+                        else 
+                            false
+                        
                     else
                         printfn "Cell %O is not empty" indexValue.Value
                         true

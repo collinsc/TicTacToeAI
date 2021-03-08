@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="TestFunctions.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
@@ -21,9 +22,9 @@
     <PackageReference Include="MSTest.TestFramework" Version="2.1.0" />
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
   </ItemGroup>
-
+  
   <ItemGroup>
-    <ProjectReference Include="..\FunctionalTicTacToe\TicTacToeGame.fsproj" />
+    <ProjectReference Include="..\TicTacToe.Game\TicTacToe.Game.fsproj" />
   </ItemGroup>
 
 

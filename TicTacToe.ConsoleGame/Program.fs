@@ -1,14 +1,14 @@
-﻿namespace TicTacToeGame.ConsoleGame
+﻿namespace TicTacToe.ConsoleGame
 module Main =
     open System
     open ConsoleGame
     
     
     let LoopUntilQuit prompt processFunc =
-        let getInput = 
-            printf "\n %s" prompt
-            Console.ReadLine()
-        Seq.initInfinite(fun _ -> getInput)                         // inifinite sequence of user input
+        
+        Seq.initInfinite(fun _ -> 
+                printf "\n %s" prompt
+                Console.ReadLine())                                 // inifinite sequence of user input
             |> Seq.tryFind(fun input -> not(processFunc input))     // process untl execute function returns false
             |> ignore
     

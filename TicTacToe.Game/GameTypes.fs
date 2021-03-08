@@ -1,4 +1,4 @@
-﻿namespace TicTacToeGame
+﻿namespace TicTacToe.Game
 module GameTypes =
     type CellState = 
         | Empty
@@ -12,7 +12,7 @@ module GameTypes =
         | Column1
         | Column2
         | Column3
-        | DiagonoalMajor
+        | DiagonalMajor
         | DiagonalMinor
     
     type Turn = 
