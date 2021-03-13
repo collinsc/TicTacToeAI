@@ -6,11 +6,11 @@ module ConsoleGame =
 
     // processes input & feeds to TicTacToe object
     type ConsoleGame() as this = 
-        let game = Instance(Some(XTurn))
+        let game = Game(Some(XTurn))
         do 
             printfn "%s" this.BuildGameString
             // first move is randomized so AI might go first, currently O is ai
-            if game.State = GameState.Turn(OTurn) then
+            if game.State = State.Turn(OTurn) then
                 game.TakeAITurn()
                 printfn "%s" this.BuildGameString
 
@@ -45,8 +45,9 @@ module ConsoleGame =
                     | _ -> None
 
                 if indexValue.IsSome then
-                    if game.IsEmpty indexValue.Value then
-                        game.TakeTurn(indexValue.Value)
+                    let row, col = indexValue.Value
+                    if game.IsEmpty row col then
+                        game.TakeTurn row col
                         printfn "%s" this.BuildGameString
                         if not(game.IsOver) then
                             game.TakeAITurn()
@@ -65,11 +66,12 @@ module ConsoleGame =
 
         member this.BuildGameString = 
         
-            let getCellStr cell =
+            let getCellStr (cell:CellState) =
                 match cell with
-                | Empty -> " "
-                | X -> "X"
-                | O -> "O"
+                | CellState.Empty -> " "
+                | CellState.X -> "X"
+                | CellState.O -> "O"
+                | _ -> raise(NotImplementedException("???"))
         
             let getDecoratedCell row col cell =
                 match (row,col) with
@@ -84,11 +86,11 @@ module ConsoleGame =
                     | XTurn -> "X"
                     | OTurn -> "O"
                 match state with
-                    | GameState.FinalState({Turn = t; EndCondition = e}) ->  
+                    | State.FinalState({Turn = t; EndCondition = e}) ->  
                         match e with 
-                        | Draw -> sprintf "%s forced draw" (getPlayer t)
+                        | EndCondition.Draw -> sprintf "%s forced draw" (getPlayer t)
                         | _ -> sprintf "%s won by %O" (getPlayer t) e 
-                    | GameState.Turn(t)-> sprintf "It's %s's turn" (getPlayer t)
+                    | State.Turn(t)-> sprintf "It's %s's turn" (getPlayer t)
         
             let buildStrings = Array2D.mapi(fun r c cell -> getDecoratedCell(r)(c)(cell))
         

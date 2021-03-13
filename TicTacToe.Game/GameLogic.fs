@@ -19,16 +19,15 @@ module GameLogic =
         | _ -> Game.Default randomFirstPlayer
 
 
-    let isOver game =
-        match game.State with 
-        | GameState.Turn(_) -> false
+    let isOver state =
+        match state with 
+        | State.Turn(_) -> false
         | _ -> true
 
         
     let getLegalMoves board =
-        
-        let cells = Array2D.mapi(fun r c cell -> (cell, (r,c)))(board)
-        cells 
+        let statesByIndex = Array2D.mapi(fun r c cell -> (cell, (r,c)))(board)
+        statesByIndex 
             |> Seq.cast<CellState*(int*int)>
             |> Seq.filter(fun tup -> fst(tup) = CellState.Empty)
             |> Seq.map(fun tup -> snd(tup))
@@ -37,7 +36,7 @@ module GameLogic =
     let getMovesRemaining board = getLegalMoves board |> Seq.length
 
 
-    let private computeState (starting: GameState)(newBoard: CellState[,]) =
+    let private computeState (starting: State)(newBoard: CellState[,]) =
         let check3InARow a b c = a <> CellState.Empty && b = a && c = a
         let winCondition = 
             match newBoard with 
@@ -53,27 +52,34 @@ module GameLogic =
 
         let turn = 
             match starting with
-            | GameState.Turn t -> t
-            | GameState.FinalState s -> s.Turn
+            | State.Turn t -> t
+            | State.FinalState s -> s.Turn
 
         match winCondition with 
         | Some condition -> 
-            GameState.FinalState { Turn = turn; EndCondition = condition }
+            State.FinalState { Turn = turn; EndCondition = condition }
         | None when getMovesRemaining newBoard = 0 -> 
-            GameState.FinalState { Turn = turn; EndCondition = EndCondition.Draw }
+            State.FinalState { Turn = turn; EndCondition = EndCondition.Draw }
         | None ->
             match turn with 
-            | XTurn -> GameState.Turn(OTurn)
-            | OTurn -> GameState.Turn(XTurn)       
+            | XTurn -> State.Turn(OTurn)
+            | OTurn -> State.Turn(XTurn)       
 
+    let isEmpty ( board:CellState[,] ) row col = board.[row,col] = CellState.Empty
 
-    let performMove(game:Game)(move:int*int) =
-        let row, col = move
-        if not(isOver game) && (game.Board.[row,col] = CellState.Empty) then 
+    let getWinningPlayer state = 
+        match state with
+        | State.FinalState({EndCondition = EndCondition.Draw}) -> None
+        | State.FinalState({Turn=XTurn}) -> Some(OTurn)
+        | State.FinalState({Turn=OTurn}) -> Some(XTurn)
+        | _ -> None
+
+    let performMove( game:Game )( row:int )( col:int ) =
+        if not(isOver game.State) && ( isEmpty game.Board row col ) then 
             let desiredCellState = 
                 match game.State  with 
-                | GameState.Turn(XTurn) -> CellState.X
-                | GameState.Turn(OTurn) -> CellState.O
+                | State.Turn(XTurn) -> CellState.X
+                | State.Turn(OTurn) -> CellState.O
                 | _ -> raise(NotImplementedException("???"))
 
             let newBoard = Array2D.copy(game.Board)
@@ -84,28 +90,28 @@ module GameLogic =
         else
             game
 
-
+    // make tree-like object as a sequence
     let private makeLazyABSearchTree game =
                
-        let rec makeTree game move = 
+        let rec makeTree game row col = 
             { new LazyABSearchTree<int*int> with 
 
                 // compute a lazy sequence of moves from our current state
                 member this.Children = 
-                    if isOver game then
+                    if isOver game.State then
                         None // We are a leaf
                     else 
                         Some( // Traversal of legal moves from our state as a lazy sequence
                             seq 
-                                { for move in getLegalMoves game.Board do
-                                    let updated = performMove game move
-                                    yield makeTree updated move } )
+                                { for row, col in getLegalMoves game.Board do
+                                    let updated = performMove game row col
+                                    yield makeTree updated row col } )
 
                 // Heuristic score at this state
                 member this.GetScore searchData = 
                     match game.State with
                     // Staying alive is it's own reward
-                    | GameState.Turn(_) -> searchData.Depth
+                    | State.Turn(_) -> searchData.Depth
                     // Tie is still a win for a tic tac toe ai no matter who did it
                     | FinalState{Turn = _; EndCondition = EndCondition.Draw } -> 10
                     | FinalState{Turn = _; EndCondition = _ } -> 
@@ -117,12 +123,12 @@ module GameLogic =
                             (50 - searchData.Depth)
                 
                 // We return the move that got us to this state and score
-                member this.Value = move }
+                member this.Value = (row,col) }
 
-        makeTree game (-1,-1)
+        makeTree game -1 -1
     
 
-    let private makeInitialSearchData game =  ABSearchData<int*int>.Default (getMovesRemaining game.Board + 5 )
+    let private makeInitialSearchData game =  ABSearchData<int*int>.Default ( getMovesRemaining game.Board + 5 )
 
     
     let computeAIMove game =
@@ -141,3 +147,5 @@ module GameLogic =
             let result = doABPruningSearch tree initialData
             printfn $"Selected Move {result.Value}, path {result.PrettyString}"
             result.Value
+
+

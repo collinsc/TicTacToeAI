@@ -5,9 +5,6 @@ module GameTypes =
         | Empty = 0
         | X = 1
         | O = 2
-    
-
-    
 
     type Turn = 
         | XTurn
@@ -31,15 +28,26 @@ module GameTypes =
           EndCondition : EndCondition }
 
     
-    type GameState =
+    type State =
         | Turn of Turn
         | FinalState of FinalState
 
 
     type Game =
         { Board : CellState[,]
-          State : GameState }
+          State : State }
 
         static member Default turn =
             { Board= Array2D.create 3 3 CellState.Empty
-              State = GameState.Turn(turn)}
+              State = State.Turn(turn) }
+
+
+    type IGameService = 
+        abstract member TakeTurn : row:int -> col:int -> unit
+        abstract member TakeAITurn : unit -> unit
+        abstract member IsLegal : row:int -> col:int -> bool
+        abstract member GetCellState : row:int -> col:int -> CellState
+        abstract member IsOver : bool
+        abstract member ActivePlayer : Turn
+        abstract member EndCondition : FinalState
+        abstract member WinningPlayer : Turn

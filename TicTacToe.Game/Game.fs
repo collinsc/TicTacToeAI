@@ -6,43 +6,33 @@ open GameLogic
 open GameTypes
     
 
-// Mutable object holds game state, major use cases and basic display
-// Contains get accessors for easy C# interop
-type Instance(turn:Option<Turn>) =
+// Main interface implementation all mutable state is in this object
+type Game(turn:Option<Turn>) =
 
     let mutable game = GameLogic.getNewGame(turn)
+                
 
-    member this.IsEmpty(row, col) = 
-        game.Board.[row, col] = CellState.Empty
-
-    member this.TakeTurn(row:int, col:int) =
-        game <- performMove(game)(row, col)
+    member this.TakeTurn row col = game <- performMove game row col
 
     member this.TakeAITurn() = 
-        let move = computeAIMove(game)
-        this.TakeTurn(move)
+        let row, col = computeAIMove game
+        this.TakeTurn row col
         
-    member this.IsOver =
-        isOver game
+    member this.IsOver = isOver game.State
 
-    member this.ActivePlayer =
-        match this.State with
-        | GameState.Turn t -> t
-        | _ -> Unchecked.defaultof<_>
-
-    member this.EndCondition = 
-        match this.State with 
-        | GameState.FinalState t -> t
-        | _ -> Unchecked.defaultof<_>
+    member this.IsEmpty row col = isEmpty game.Board row col
 
     member this.State =
         game.State
 
     member this.Board =
         game.Board
-        
 
-            
+
+
+    
+
+    
         
     
     

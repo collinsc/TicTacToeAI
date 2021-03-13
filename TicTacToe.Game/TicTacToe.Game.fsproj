@@ -15,6 +15,7 @@
     <Compile Include="ABPruningAI.fs" />
     <Compile Include="GameLogic.fs" />
     <Compile Include="Game.fs" />
+    <Compile Include="Interop.fs" />
   </ItemGroup>
 
   <ItemGroup>

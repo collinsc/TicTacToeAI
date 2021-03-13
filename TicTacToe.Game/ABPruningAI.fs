@@ -48,6 +48,7 @@ module ABPruningAI =
                 Maximizing = maximizing
                 Result = ABSearchResult<'T>.Default maximizing }
 
+    // sequence logic for tree of game states implemented in other module
     type LazyABSearchTree<'T>=
         abstract member Children : option<seq<LazyABSearchTree<'T>>>
         abstract member GetScore : ABSearchData<'T> -> int
@@ -90,7 +91,7 @@ module ABPruningAI =
             let resultSequence =
                 // lazy computation for the score at each child
                 Seq.scan computeChild parameters root.Children.Value 
-                // cache the results (we need last compuatation if we can't break early)
+                // cache the results (we need last result for algorihtm if we can't break early)
                 |> Seq.cache
 
             // perform computation
