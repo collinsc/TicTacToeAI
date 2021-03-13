@@ -14,17 +14,17 @@ module TestFunctions =
                 (fun state ->
                     match state with 
                     | _ when doAi -> Some(GameState.Turn(startingTurn.Value), GameState.Turn(startingTurn.Value))
-                    | GameState.Turn(XTurn) -> Some(GameState.Turn(OTurn),GameState.Turn(OTurn))
-                    | GameState.Turn(OTurn) -> Some(GameState.Turn(XTurn),GameState.Turn(XTurn))
+                    | GameState.Turn(Turn.XTurn) -> Some(GameState.Turn(Turn.OTurn),GameState.Turn(Turn.OTurn))
+                    | GameState.Turn(Turn.OTurn) -> Some(GameState.Turn(Turn.XTurn),GameState.Turn(Turn.XTurn))
                     | _ -> None)
 
         for move, turn in Seq.zip(moves)(turnOrder) do
             Assert.IsFalse game.IsOver
             match turn with 
-            | GameState.Turn(OTurn) when doAi -> 
+            | GameState.Turn(Turn.OTurn) when doAi -> 
                 game.TakeAITurn()
                 if not(game.IsOver) then game.TakeTurn(move)
-            | GameState.Turn(XTurn) when doAi -> 
+            | GameState.Turn(Turn.XTurn) when doAi -> 
                 game.TakeTurn(move)
                 if not (game.IsOver) then game.TakeAITurn()
             | _ -> game.TakeTurn(move)
@@ -32,9 +32,9 @@ module TestFunctions =
         // fencepost
         if (doAi 
             && startingTurn.IsSome 
-            && startingTurn.Value = OTurn 
+            && startingTurn.Value = Turn.OTurn 
             && not game.IsOver 
-            && game.State = GameState.Turn(OTurn)) then game.TakeAITurn()
+            && game.State = GameState.Turn(Turn.OTurn)) then game.TakeAITurn()
         Assert.IsTrue game.IsOver
         match game.State with
         | FinalState s -> Assert.AreEqual(endCondition, s.EndCondition)

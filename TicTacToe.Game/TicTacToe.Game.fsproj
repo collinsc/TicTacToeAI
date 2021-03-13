@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <Compile Include="GameTypes.fs" />
-    <Compile Include="ABPruning.fs" />
+    <Compile Include="ABPruningAI.fs" />
     <Compile Include="GameLogic.fs" />
     <Compile Include="Game.fs" />
   </ItemGroup>

@@ -10,24 +10,24 @@ type TestGameStates () =
     [<TestMethod>]
     member this.TestColWins() = 
         seq { 
-            (seq { (0,0); (1,1); (1,0); (2,2); (2,0) }, EndCondition.WinCondition(WinCondition.Column1))
-            (seq { (0,1); (1,2); (1,1); (2,2); (2,1) }, EndCondition.WinCondition(WinCondition.Column2))
-            (seq { (0,2); (1,1); (1,2); (2,1); (2,2) }, EndCondition.WinCondition(WinCondition.Column3))
+            (seq { (0,0); (1,1); (1,0); (2,2); (2,0) }, EndCondition.Column1)
+            (seq { (0,1); (1,2); (1,1); (2,2); (2,1) }, EndCondition.Column2)
+            (seq { (0,2); (1,1); (1,2); (2,1); (2,2) }, EndCondition.Column3)
             } |> executeStateTestSequence
 
     [<TestMethod>]
     member this.TestRowWins() = 
         seq { 
-            (seq { (0,0); (1,1); (0,1); (2,2); (0,2) }, EndCondition.WinCondition(WinCondition.Row1)) 
-            (seq { (1,0); (0,1); (1,1); (2,2); (1,2) }, EndCondition.WinCondition(WinCondition.Row2))
-            (seq { (2,0); (0,1); (2,1); (1,2); (2,2) }, EndCondition.WinCondition(WinCondition.Row3))
+            (seq { (0,0); (1,1); (0,1); (2,2); (0,2) }, EndCondition.Row1) 
+            (seq { (1,0); (0,1); (1,1); (2,2); (1,2) }, EndCondition.Row2)
+            (seq { (2,0); (0,1); (2,1); (1,2); (2,2) }, EndCondition.Row3)
             } |> executeStateTestSequence
 
     [<TestMethod>]     
     member this.TestDiagWins() = 
         seq { 
-            (seq { (0,0); (0,1); (1,1); (0,2); (2,2) }, EndCondition.WinCondition(WinCondition.DiagonalMajor))
-            (seq { (0,2); (0,1); (1,1); (1,2); (2,0) }, EndCondition.WinCondition(WinCondition.DiagonalMinor))
+            (seq { (0,0); (0,1); (1,1); (0,2); (2,2) }, EndCondition.DiagonalMajor)
+            (seq { (0,2); (0,1); (1,1); (1,2); (2,0) }, EndCondition.DiagonalMinor)
             } |> executeStateTestSequence
 
     [<TestMethod>]    
@@ -42,9 +42,9 @@ type TestAI () =
     [<TestMethod>]
     member this.TestAiWins() = 
         seq { 
-            (seq {(0,0); (0,1); (1,0);}, EndCondition.WinCondition(WinCondition.DiagonalMinor), Some(XTurn))
-            (seq {(2,0); (2,1); (1,0);}, EndCondition.WinCondition(WinCondition.DiagonalMajor), Some(XTurn))
-            (seq {(1,0); (2,0); }, EndCondition.WinCondition(WinCondition.DiagonalMajor), Some(OTurn))
+            (seq {(0,0); (0,1); (1,0);},    EndCondition.DiagonalMinor, Some(XTurn))
+            (seq {(2,0); (2,1); (1,0);},    EndCondition.DiagonalMajor, Some(XTurn))
+            (seq {(1,0); (2,0); },          EndCondition.DiagonalMajor, Some(OTurn))
             } |> executeAiTestSequence 
 
     [<TestMethod>]

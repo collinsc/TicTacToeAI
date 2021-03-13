@@ -3,7 +3,7 @@
 module GameLogic =
     open System
     open GameTypes
-    open ABPruning
+    open ABPruningAI
 
 
     let private randomFirstPlayer = 
@@ -30,7 +30,7 @@ module GameLogic =
         let cells = Array2D.mapi(fun r c cell -> (cell, (r,c)))(board)
         cells 
             |> Seq.cast<CellState*(int*int)>
-            |> Seq.filter(fun tup -> fst(tup) = Empty)
+            |> Seq.filter(fun tup -> fst(tup) = CellState.Empty)
             |> Seq.map(fun tup -> snd(tup))
 
 
@@ -38,17 +38,17 @@ module GameLogic =
 
 
     let private computeState (starting: GameState)(newBoard: CellState[,]) =
-        let check3InARow a b c = a <> Empty && b = a && c = a
+        let check3InARow a b c = a <> CellState.Empty && b = a && c = a
         let winCondition = 
             match newBoard with 
-            | b when check3InARow b.[0,0] b.[0,1] b.[0,2] -> Some(WinCondition.Row1)
-            | b when check3InARow b.[1,0] b.[1,1] b.[1,2] -> Some(WinCondition.Row2)
-            | b when check3InARow b.[2,0] b.[2,1] b.[2,2] -> Some(WinCondition.Row3)
-            | b when check3InARow b.[0,0] b.[1,0] b.[2,0] -> Some(WinCondition.Column1)
-            | b when check3InARow b.[0,1] b.[1,1] b.[2,1] -> Some(WinCondition.Column2)
-            | b when check3InARow b.[0,2] b.[1,2] b.[2,2] -> Some(WinCondition.Column3)
-            | b when check3InARow b.[0,0] b.[1,1] b.[2,2] -> Some(WinCondition.DiagonalMajor)
-            | b when check3InARow b.[0,2] b.[1,1] b.[2,0] -> Some(WinCondition.DiagonalMinor)
+            | b when check3InARow b.[0,0] b.[0,1] b.[0,2] -> Some(EndCondition.Row1)
+            | b when check3InARow b.[1,0] b.[1,1] b.[1,2] -> Some(EndCondition.Row2)
+            | b when check3InARow b.[2,0] b.[2,1] b.[2,2] -> Some(EndCondition.Row3)
+            | b when check3InARow b.[0,0] b.[1,0] b.[2,0] -> Some(EndCondition.Column1)
+            | b when check3InARow b.[0,1] b.[1,1] b.[2,1] -> Some(EndCondition.Column2)
+            | b when check3InARow b.[0,2] b.[1,2] b.[2,2] -> Some(EndCondition.Column3)
+            | b when check3InARow b.[0,0] b.[1,1] b.[2,2] -> Some(EndCondition.DiagonalMajor)
+            | b when check3InARow b.[0,2] b.[1,1] b.[2,0] -> Some(EndCondition.DiagonalMinor)
             | _ -> None
 
         let turn = 
@@ -58,9 +58,9 @@ module GameLogic =
 
         match winCondition with 
         | Some condition -> 
-            GameState.FinalState { Turn = turn; EndCondition = (EndCondition.WinCondition condition) }
+            GameState.FinalState { Turn = turn; EndCondition = condition }
         | None when getMovesRemaining newBoard = 0 -> 
-            GameState.FinalState { Turn = turn; EndCondition = Draw }
+            GameState.FinalState { Turn = turn; EndCondition = EndCondition.Draw }
         | None ->
             match turn with 
             | XTurn -> GameState.Turn(OTurn)
@@ -69,11 +69,11 @@ module GameLogic =
 
     let performMove(game:Game)(move:int*int) =
         let row, col = move
-        if not(isOver game) && (game.Board.[row,col] = Empty) then 
+        if not(isOver game) && (game.Board.[row,col] = CellState.Empty) then 
             let desiredCellState = 
                 match game.State  with 
-                | GameState.Turn(XTurn) -> X
-                | GameState.Turn(OTurn) -> O
+                | GameState.Turn(XTurn) -> CellState.X
+                | GameState.Turn(OTurn) -> CellState.O
                 | _ -> raise(NotImplementedException("???"))
 
             let newBoard = Array2D.copy(game.Board)
@@ -85,10 +85,12 @@ module GameLogic =
             game
 
 
-    let private makeABSearchTree game =
+    let private makeLazyABSearchTree game =
+               
         let rec makeTree game move = 
             { new LazyABSearchTree<int*int> with 
 
+                // compute a lazy sequence of moves from our current state
                 member this.Children = 
                     if isOver game then
                         None // We are a leaf
@@ -99,19 +101,22 @@ module GameLogic =
                                     let updated = performMove game move
                                     yield makeTree updated move } )
 
+                // Heuristic score at this state
                 member this.GetScore searchData = 
-            
                     match game.State with
+                    // Staying alive is it's own reward
                     | GameState.Turn(_) -> searchData.Depth
                     // Tie is still a win for a tic tac toe ai no matter who did it
-                    | FinalState{Turn = _; EndCondition = EndCondition.Draw } -> searchData.MaxDepth - searchData.Depth
-                    | FinalState{Turn = _; EndCondition = EndCondition.WinCondition(_) } -> 
-                        // If we end the game and it's the ai's turn the ai lost
-                        if searchData.Maximizing then System.Int32.MinValue +   1 else (50 - searchData.Depth)
-                        // Score wins with less moves higher
-                        
-
-
+                    | FinalState{Turn = _; EndCondition = EndCondition.Draw } -> 10
+                    | FinalState{Turn = _; EndCondition = _ } -> 
+                        if searchData.Maximizing then 
+                            // We lost, penalize
+                            System.Int32.MinValue +   1 
+                        else 
+                            // We won! Score wins with less moves higher
+                            (50 - searchData.Depth)
+                
+                // We return the move that got us to this state and score
                 member this.Value = move }
 
         makeTree game (-1,-1)
@@ -121,17 +126,17 @@ module GameLogic =
 
     
     let computeAIMove game =
-        // Tic Tac Toe is a solved game so lets save some compute time on the 1st & 2nd moves
+        // Tic Tac Toe is a solved game so we already know the best opening + response
         let movesRemaining = getLegalMoves game.Board |> Seq.length
         match movesRemaining with
         | 9 -> (0,0)    // best opening is corner square
         | 8 when        // best response is center
-            game.Board.[0,0] <> Empty ||
-            game.Board.[2,0] <> Empty || 
-            game.Board.[0,2] <> Empty ||
-            game.Board.[0,2] <> Empty -> (1,1)
+            game.Board.[0,0] <> CellState.Empty ||
+            game.Board.[2,0] <> CellState.Empty || 
+            game.Board.[0,2] <> CellState.Empty ||
+            game.Board.[0,2] <> CellState.Empty -> (1,1)
         | _ -> 
-            let tree = makeABSearchTree game
+            let tree = makeLazyABSearchTree game
             let initialData = makeInitialSearchData game
             let result = doABPruningSearch tree initialData
             printfn $"Selected Move {result.Value}, path {result.PrettyString}"

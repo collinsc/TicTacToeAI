@@ -1,6 +1,6 @@
 ﻿namespace TicTacToe.Game
 
-module ABPruning =
+module ABPruningAI =
 
     let private prettyNode score value = sprintf "{%d : %A}" score value
 
@@ -69,10 +69,9 @@ module ABPruning =
             Beta = if replaceBeta then newValue.Score else oldData.Beta }
 
 
-    //
     let rec doABPruningSearch (root:LazyABSearchTree<_>)(parameters:ABSearchData<_>) =
         if parameters.IsMaxDepth || root.Children.IsNone then
-            // base case, game over or no more lookahead
+            // base case, game over or no more lookahead in search
             { Score = root.GetScore parameters; Value = root.Value }
         else
             // perform MinMaxABPruning algorithm for this tree
@@ -89,8 +88,10 @@ module ABPruning =
 
             // setup lazy computation for all children
             let resultSequence =
-                Seq.scan computeChild parameters root.Children.Value // lazy computation for the score at each child
-                |> Seq.cache                            // cache the results (we might need to get last compuatation)
+                // lazy computation for the score at each child
+                Seq.scan computeChild parameters root.Children.Value 
+                // cache the results (we need last compuatation if we can't break early)
+                |> Seq.cache
 
             // perform computation
             let earlyResult = 
