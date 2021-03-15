@@ -6,7 +6,7 @@ module GameLogic =
     open ABPruningAI
 
 
-    let private randomFirstPlayer = 
+    let private randomFirstPlayer() = 
         if System.Random().Next(0,2) > 0 then 
             XTurn 
         else 
@@ -16,7 +16,7 @@ module GameLogic =
     let getNewGame turn = 
         match turn with
         | Some turn -> Game.Default turn
-        | _ -> Game.Default randomFirstPlayer
+        | _ -> Game.Default (randomFirstPlayer())
 
 
     let isOver state =
@@ -90,45 +90,28 @@ module GameLogic =
         else
             game
 
-    // make tree-like object as a sequence
-    let private makeLazyABSearchTree game =
-               
-        let rec makeTree game row col = 
-            { new LazyABSearchTree<int*int> with 
-
-                // compute a lazy sequence of moves from our current state
-                member this.Children = 
-                    if isOver game.State then
-                        None // We are a leaf
+    let aiGame =
+        { new PlayableGame<Game,int*int> with
+            member this.ComputeState game move = 
+                performMove game (fst move) (snd move)
+            member this.LegalMoves game = 
+                match getLegalMoves game.Board with 
+                | a when (not (isOver game.State)) &&  Seq.tryHead a <> None -> Some(a)
+                | _ -> None
+            member this.Score root = 
+                match root.State.State  with
+                | State.Turn(_) -> 0
+                // Tie is still a win for a tic tac toe ai no matter who did it
+                | FinalState{Turn = _; EndCondition = EndCondition.Draw } -> 10
+                | FinalState{Turn = _; EndCondition = _ } -> 
+                    if root.Maximizing then 
+                        // We lost, penalize
+                        System.Int32.MinValue +   1 
                     else 
-                        Some( // Traversal of legal moves from our state as a lazy sequence
-                            seq 
-                                { for row, col in getLegalMoves game.Board do
-                                    let updated = performMove game row col
-                                    yield makeTree updated row col } )
-
-                // Heuristic score at this state
-                member this.GetScore searchData = 
-                    match game.State with
-                    // Staying alive is it's own reward
-                    | State.Turn(_) -> searchData.Depth
-                    // Tie is still a win for a tic tac toe ai no matter who did it
-                    | FinalState{Turn = _; EndCondition = EndCondition.Draw } -> 10
-                    | FinalState{Turn = _; EndCondition = _ } -> 
-                        if searchData.Maximizing then 
-                            // We lost, penalize
-                            System.Int32.MinValue +   1 
-                        else 
-                            // We won! Score wins with less moves higher
-                            (50 - searchData.Depth)
-                
-                // We return the move that got us to this state and score
-                member this.Value = (row,col) }
-
-        makeTree game -1 -1
+                        // We won! Score wins with less moves higher
+                        System.Int32.MaxValue - root.Depth}
     
 
-    let private makeInitialSearchData game =  ABSearchData<int*int>.Default ( getMovesRemaining game.Board + 5 )
 
     
     let computeAIMove game =
@@ -142,10 +125,8 @@ module GameLogic =
             game.Board.[0,2] <> CellState.Empty ||
             game.Board.[0,2] <> CellState.Empty -> (1,1)
         | _ -> 
-            let tree = makeLazyABSearchTree game
-            let initialData = makeInitialSearchData game
-            let result = doABPruningSearch tree initialData
-            printfn $"Selected Move {result.Value}, path {result.PrettyString}"
-            result.Value
+            let initialData = ABSearchData<Game,int*int>.Default ( getMovesRemaining game.Board ) game
+            let result = ABPruningAI.ComputeSearch initialData aiGame
+            result.NextMove.Value
 
 

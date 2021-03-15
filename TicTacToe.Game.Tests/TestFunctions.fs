@@ -4,9 +4,21 @@ module TestFunctions =
     open Microsoft.VisualStudio.TestTools.UnitTesting
     open TicTacToe.Game.GameTypes
     open TicTacToe.Game
+    open TicTacToe.Game.GameLogic
+
+    let log = true
+
+    let takeHumanTurn (game:Game) row col = 
+        game.TakeTurn row col
+        if log then printfn "%s" (game.ToString())
+
+    let takeAITurn (game:Game)= 
+        game.TakeAITurn()
+        if log then printfn "%s" (game.ToString())
 
     let playGame doAi startingTurn moves endCondition =
         let game = Game(startingTurn)
+
             
         let turnOrder = 
             game.State 
@@ -22,14 +34,14 @@ module TestFunctions =
             Assert.IsFalse game.IsOver
             match turn with 
             | State.Turn(Turn.OTurn) when doAi -> 
-                game.TakeAITurn()
+                takeAITurn game
                 if not(game.IsOver) then 
-                    game.TakeTurn row col
+                    takeHumanTurn game row col
             | State.Turn(Turn.XTurn) when doAi -> 
-                game.TakeTurn row col
+                takeHumanTurn game row col
                 if not (game.IsOver) then 
-                    game.TakeAITurn()
-            | _ -> game.TakeTurn row col
+                    takeAITurn game
+            | _ -> takeHumanTurn game row col
             if not(game.IsOver) then Assert.AreEqual(turn, game.State) 
         // fencepost
         if (doAi 
@@ -37,7 +49,7 @@ module TestFunctions =
             && startingTurn.Value = Turn.OTurn 
             && not game.IsOver 
             && game.State = State.Turn(Turn.OTurn)) then 
-                game.TakeAITurn()
+                takeAITurn game
         Assert.IsTrue game.IsOver
         match game.State with
         | FinalState s -> Assert.AreEqual(endCondition, s.EndCondition)
