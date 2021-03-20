@@ -1,8 +1,12 @@
 ﻿namespace TicTacToe.ConsoleGame
+
+
 module ConsoleGame = 
+
+    open System
     open TicTacToe.Game
     open GameTypes
-    open System
+    open MutableState
 
     // processes input & feeds to TicTacToe object
     type ConsoleGame() as this = 
@@ -34,14 +38,14 @@ module ConsoleGame =
                 let indexValue = 
                     let indexTokens =
                         tokens 
-                        |> Seq.filter(fun s -> s <> null && s.Length > 0)
+                        |> Seq.filter(fun s -> not(isNull s) && s.Length > 0)
                         |> Seq.map(fun s -> 
                             let mutable i = -1
                             if Int32.TryParse(s, &i) then i else -1)
                         |> Seq.filter(fun i -> i >= 0 && i < 3)
                         |> Seq.toArray
                     match indexTokens with 
-                    | [|r; c|]-> Some(r,c)
+                    | [|r; c|]-> Some(r, c)
                     | _ -> None
 
                 if indexValue.IsSome then
@@ -74,10 +78,13 @@ module ConsoleGame =
                 | _ -> raise(NotImplementedException("???"))
         
             let getDecoratedCell row col cell =
-                match (row,col) with
-                | (0,2) | (1,2) ->   getCellStr(cell) + "\n-----\n" 
-                | (2,2) -> getCellStr(cell)
-                | (1,_) | (2,_) | (0,_) -> getCellStr(cell) + "|"
+                match (row, col) with
+                | (0, 2) 
+                | (1, 2) ->   getCellStr(cell) + "\n-----\n" 
+                | (2, 2) -> getCellStr(cell)
+                | (1, _) 
+                | (2, _) 
+                | (0, _) -> getCellStr(cell) + "|"
                 | _ -> raise(NotImplementedException("???"))
         
             let getStateStr state = 
@@ -86,7 +93,7 @@ module ConsoleGame =
                     | XTurn -> "X"
                     | OTurn -> "O"
                 match state with
-                    | State.FinalState({Turn = t; EndCondition = e}) ->  
+                    | State.FinalState({Turn = t; EndCondition = e}) ->
                         match e with 
                         | EndCondition.Draw -> sprintf "%s forced draw" (getPlayer t)
                         | _ -> sprintf "%s won by %O" (getPlayer t) e 
@@ -99,15 +106,3 @@ module ConsoleGame =
             String.Concat(seq { 
                 sprintf "%s\n" (getStateStr game.State)
                 yield! strSeq})
-    
-
-
-
-
-
-        
-
-
-
-
-

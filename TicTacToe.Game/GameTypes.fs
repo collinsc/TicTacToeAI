@@ -24,8 +24,8 @@ module GameTypes =
     
 
     type FinalState = 
-        { Turn : Turn
-          EndCondition : EndCondition }
+        { Turn:Turn
+          EndCondition:EndCondition }
 
     
     type State =
@@ -34,8 +34,8 @@ module GameTypes =
 
 
     type Game =
-        { Board : CellState[,]
-          State : State }
+        { Board:CellState[,]
+          State:State }
 
         static member Default turn =
             { Board= Array2D.create 3 3 CellState.Empty
