@@ -18,12 +18,16 @@ module MutableState =
         member this.TakeTurn row col = game <- performMove game row col
     
         member this.TakeAITurn() = 
-            let row, col = computeAIMove game
+            let row, col = computeAIMove false game
+            this.TakeTurn row col
+
+        member this.TakeDeterministicAITurn() = 
+            let row, col = computeAIMove true game
             this.TakeTurn row col
             
         member this.IsOver = isOver game.State
     
-        member this.IsEmpty row col = isEmpty game.Board row col
+        member this.IsEmpty row col = isEmptyCell game.Board row col
     
         member this.State =
             game.State

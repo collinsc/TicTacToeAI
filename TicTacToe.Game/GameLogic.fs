@@ -14,6 +14,11 @@ module GameLogic =
             OTurn
 
 
+    let isEmpty cell = cell = CellState.Empty
+
+
+    let isEmptyCell ( board:CellState[,] ) row col = isEmpty board.[row,col]
+
     let getNewGame turn = 
         match turn with
         | Some turn -> Game.Default turn
@@ -28,13 +33,13 @@ module GameLogic =
         
     let getLegalMoves board =
         let getStateByIndex r c cell  = (cell, (r, c))
-        let isNonEmpty cellIndex = fst(cellIndex) = CellState.Empty
+        let isEmpty cellIndex = isEmpty(fst(cellIndex))
         let getIndex cellIndex = snd(cellIndex)
         let statesByIndex = Array2D.mapi getStateByIndex board
         let nonEmptyIndexes = 
             statesByIndex 
             |> Seq.cast<CellState*(int*int)> 
-            |> Seq.filter(isNonEmpty) 
+            |> Seq.filter(isEmpty) 
             |> Seq.map(getIndex)
         nonEmptyIndexes
 
@@ -43,7 +48,7 @@ module GameLogic =
 
 
     let private computeState (starting:State)(newBoard:CellState[,]) =
-        let check3InARow a b c = a <> CellState.Empty && b = a && c = a
+        let check3InARow (a:CellState) b c = not(isEmpty(a)) && b = a && c = a
         let winCondition = 
             match newBoard with 
             | b when check3InARow b.[0, 0] b.[0, 1] b.[0, 2] -> Some(EndCondition.Row1)
@@ -71,7 +76,6 @@ module GameLogic =
             | XTurn -> State.Turn(OTurn)
             | OTurn -> State.Turn(XTurn)
 
-    let isEmpty ( board:CellState[,] ) row col = board.[row,col] = CellState.Empty
 
     let getWinningPlayer state = 
         match state with
@@ -81,7 +85,7 @@ module GameLogic =
         | _ -> None
 
     let performMove( game:Game )( row:int )( col:int ) =
-        if not(isOver game.State) && ( isEmpty game.Board row col ) then 
+        if not(isOver game.State) && ( isEmptyCell game.Board row col ) then 
             let desiredCellState = 
                 match game.State  with 
                 | State.Turn(XTurn) -> CellState.X
@@ -117,19 +121,32 @@ module GameLogic =
                             // We won! Score wins with less moves higher
                             System.Int32.MaxValue - root.Depth }
     
-
+    
 
     
-    let computeAIMove game =
+    let computeAIMove isDeterministic game =
+
+        let corners = [| (0, 0); (0, 2); (2, 0); (2, 2) |]
+        
+        let computeAIOpeningMove() = 
+            corners.[System.Random().Next(0, 4)]
+        
+        let isCornerFilled() =
+            let checkCorner(row,col) = not(isEmptyCell game.Board row col)
+            match Array.tryFind checkCorner corners with
+            | Some(_) -> true
+            | _ -> false
+            
+        
         // Tic Tac Toe is a solved game so we already know the best opening + response
         let movesRemaining = getLegalMoves game.Board |> Seq.length
         match movesRemaining with
-        | 9 -> (0, 0)    // best opening is corner square
-        | 8 when        // best response is center
-            game.Board.[0,0] <> CellState.Empty ||
-            game.Board.[2,0] <> CellState.Empty || 
-            game.Board.[0,2] <> CellState.Empty ||
-            game.Board.[0,2] <> CellState.Empty -> (1, 1)
+        | 9 -> 
+            if isDeterministic then // best opening is corner square
+                (0, 0)
+            else 
+                computeAIOpeningMove()
+        | 8 when isCornerFilled()  -> (1, 1) // best response is center
         | _ -> 
             let initialData = ABSearchData<Game,int*int>.Default ( getMovesRemaining game.Board ) game
             let result = ABPruningAI.ComputeSearch initialData aiGame
