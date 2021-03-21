@@ -1,6 +1,7 @@
 # TicTacToeAI
 
 Tic Tac Toe library with MinMax Alpha Beta Pruning AI, written in F# using .Net 5.0.
+
 Integrates with my WPF MVVM game.
 
 ## Assemblies
