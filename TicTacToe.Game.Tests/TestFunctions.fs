@@ -28,18 +28,18 @@ module TestFunctions =
                 (fun state ->
                     match state with 
                     | _ when doAi -> Some(State.Turn(startingTurn.Value), State.Turn(startingTurn.Value))
-                    | State.Turn(Turn.XTurn) -> Some(State.Turn(Turn.OTurn), State.Turn(Turn.OTurn))
-                    | State.Turn(Turn.OTurn) -> Some(State.Turn(Turn.XTurn), State.Turn(Turn.XTurn))
+                    | State.Turn(Player.X) -> Some(State.Turn(Player.O), State.Turn(Player.O))
+                    | State.Turn(Player.O) -> Some(State.Turn(Player.X), State.Turn(Player.X))
                     | _ -> None)
 
         for (row, col), turn in Seq.zip(moves)(turnOrder) do
             Assert.IsFalse game.IsOver
             match turn with 
-            | State.Turn(Turn.OTurn) when doAi -> 
+            | State.Turn(Player.O) when doAi -> 
                 takeAITurn game
                 if not(game.IsOver) then 
                     takeHumanTurn game row col
-            | State.Turn(Turn.XTurn) when doAi -> 
+            | State.Turn(Player.X) when doAi -> 
                 takeHumanTurn game row col
                 if not (game.IsOver) then 
                     takeAITurn game
@@ -49,8 +49,8 @@ module TestFunctions =
         let aiLastTurn = 
             doAi 
             && startingTurn.IsSome 
-            && startingTurn.Value = Turn.OTurn 
-            && game.State = State.Turn(Turn.OTurn)
+            && startingTurn.Value = Player.O 
+            && game.State = State.Turn(Player.O)
         // fencepost
         if (aiLastTurn && not game.IsOver ) then 
             takeAITurn game

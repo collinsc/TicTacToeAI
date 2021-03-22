@@ -8,11 +8,11 @@ module Interfaces =
     
 
     // All Functional -> OO interface interop goes here
-    type ServiceInterop (turn: Turn Option) = 
+    type ServiceInterop (turn: Player Option) = 
         let game = Game(turn)
     
         interface IGameService with
-            member this.WinningPlayer: Turn = 
+            member this.WinningPlayer: Player = 
                 match getWinningPlayer game.State with
                 | Some(turn) -> turn
                 | _ -> Unchecked.defaultof<_>

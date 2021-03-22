@@ -9,15 +9,23 @@ module GameLogic =
 
     let private randomFirstPlayer() = 
         if System.Random().Next(0, 2) > 0 then 
-            XTurn 
+            Player.X 
         else 
-            OTurn
+            Player.O
 
 
-    let isEmpty cell = cell = CellState.Empty
+    let isEmpty cell = cell = None
 
 
-    let isEmptyCell ( board:CellState[,] ) row col = isEmpty board.[row,col]
+    let flipTurn turn = 
+        match turn with 
+        | Player.X -> Player.O
+        | Player.O -> Player.X
+        | _ -> raise(NotImplementedException("???"))
+
+
+
+    let isEmptyCell ( board:Player option[,] ) row col = isEmpty board.[row,col]
 
     let getNewGame turn = 
         match turn with
@@ -27,7 +35,7 @@ module GameLogic =
 
     let isOver state =
         match state with 
-        | State.Turn(_) -> false
+        | Turn(_) -> false
         | _ -> true
 
         
@@ -38,7 +46,7 @@ module GameLogic =
         let statesByIndex = Array2D.mapi getStateByIndex board
         let nonEmptyIndexes = 
             statesByIndex 
-            |> Seq.cast<CellState*(int*int)> 
+            |> Seq.cast<Player option*(int*int)> 
             |> Seq.filter(isEmpty) 
             |> Seq.map(getIndex)
         nonEmptyIndexes
@@ -47,8 +55,8 @@ module GameLogic =
     let getMovesRemaining board = getLegalMoves board |> Seq.length
 
 
-    let private computeState (starting:State)(newBoard:CellState[,]) =
-        let check3InARow (a:CellState) b c = not(isEmpty(a)) && b = a && c = a
+    let private computeState (starting:State)(newBoard:Player option[,]) =
+        let check3InARow (a:Player option) b c = not(isEmpty(a)) && b = a && c = a
         let winCondition = 
             match newBoard with 
             | b when check3InARow b.[0, 0] b.[0, 1] b.[0, 2] -> Some(EndCondition.Row1)
@@ -71,29 +79,25 @@ module GameLogic =
             State.FinalState { Turn = turn; EndCondition = condition }
         | None when getMovesRemaining newBoard = 0 -> 
             State.FinalState { Turn = turn; EndCondition = EndCondition.Draw }
-        | None ->
-            match turn with
-            | XTurn -> State.Turn(OTurn)
-            | OTurn -> State.Turn(XTurn)
+        | None -> State.Turn(flipTurn turn)
 
 
     let getWinningPlayer state = 
         match state with
         | State.FinalState({EndCondition = EndCondition.Draw}) -> None
-        | State.FinalState({Turn=XTurn}) -> Some(OTurn)
-        | State.FinalState({Turn=OTurn}) -> Some(XTurn)
+        | State.FinalState({Turn=Player.X}) -> Some(Player.O)
+        | State.FinalState({Turn=Player.O}) -> Some(Player.X)
         | _ -> None
 
     let performMove( game:Game )( row:int )( col:int ) =
         if not(isOver game.State) && ( isEmptyCell game.Board row col ) then 
             let desiredCellState = 
                 match game.State  with 
-                | State.Turn(XTurn) -> CellState.X
-                | State.Turn(OTurn) -> CellState.O
+                | Turn(t) -> flipTurn t
                 | _ -> raise(NotImplementedException("???"))
 
             let newBoard = Array2D.copy(game.Board)
-            newBoard.[row,col] <- desiredCellState
+            newBoard.[row,col] <- Some(desiredCellState)
             
             let newState = computeState game.State newBoard 
             { State = newState; Board = newBoard }

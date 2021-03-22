@@ -54,24 +54,24 @@ module UnitTests =
 
         [<TestMethod>]
         member this.TestAIWinRow1Going2nd() =
-            executeAiTest(seq { (1, 1); (1, 0); (2, 1); (2, 0) }, EndCondition.Row1, Some(XTurn))
+            executeAiTest(seq { (1, 1); (1, 0); (2, 1); (2, 0) }, EndCondition.Row1, Some(Player.X))
 
         [<TestMethod>]
         member this.TestAIWinCol1Going2nd() =
-            executeAiTest(seq { (1, 1); (1, 2); (0, 2)}, EndCondition.Column1, Some(XTurn))
+            executeAiTest(seq { (1, 1); (1, 2); (0, 2)}, EndCondition.Column1, Some(Player.X))
 
         [<TestMethod>]
         member this.TestAIWinDiagonalMajorGoing1st() =
-            executeAiTest(seq { (0, 1); (2, 0); (1, 2) }, EndCondition.DiagonalMajor, Some(OTurn))
+            executeAiTest(seq { (0, 1); (2, 0); (1, 2) }, EndCondition.DiagonalMajor, Some(Player.O))
 
         [<TestMethod>]
         member this.TestAIDrawBestOpeningGoing2nd() =
-            executeAiTest(seq {(0, 0); (2, 2); (2, 1); (0, 2); (1, 0)}, EndCondition.Draw, Some(XTurn))
+            executeAiTest(seq {(0, 0); (2, 2); (2, 1); (0, 2); (1, 0)}, EndCondition.Draw, Some(Player.X))
 
         [<TestMethod>]
         member this.TestAIDrawCenterOpeningGoing2nd() =
-            executeAiTest(seq {(1, 1); (1, 0); (0, 2); (2, 1); (2, 2)}, EndCondition.Draw, Some(XTurn))
+            executeAiTest(seq {(1, 1); (1, 0); (0, 2); (2, 1); (2, 2)}, EndCondition.Draw, Some(Player.X))
 
         [<TestMethod>]
         member this.TestAIDrawGoing1st() =
-            executeAiTest(seq {(1, 1); (0, 2); (1, 0); (2, 1)        }, EndCondition.Draw, Some(OTurn))
+            executeAiTest(seq {(1, 1); (0, 2); (1, 0); (2, 1)        }, EndCondition.Draw, Some(Player.O))

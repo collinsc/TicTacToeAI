@@ -1,14 +1,10 @@
 ﻿namespace TicTacToe.Game
 module GameTypes =
 
-    type CellState = 
-        | Empty = 0
-        | X = 1
-        | O = 2
 
-    type Turn = 
-        | XTurn
-        | OTurn
+    type Player = 
+        | X = 0
+        | O = 1
     
 
     type EndCondition = 
@@ -24,21 +20,21 @@ module GameTypes =
     
 
     type FinalState = 
-        { Turn:Turn
+        { Turn:Player
           EndCondition:EndCondition }
 
     
     type State =
-        | Turn of Turn
+        | Turn of Player
         | FinalState of FinalState
 
 
     type Game =
-        { Board:CellState[,]
+        { Board:Player option[,]
           State:State }
 
         static member Default turn =
-            { Board= Array2D.create 3 3 CellState.Empty
+            { Board= Array2D.create 3 3 None
               State = State.Turn(turn) }
 
 
@@ -46,8 +42,8 @@ module GameTypes =
         abstract member TakeTurn : row:int -> col:int -> unit
         abstract member TakeAITurn : unit -> unit
         abstract member IsLegal : row:int -> col:int -> bool
-        abstract member GetCellState : row:int -> col:int -> CellState
+        abstract member GetCellState : row:int -> col:int -> Player option
         abstract member IsOver : bool
-        abstract member ActivePlayer : Turn
+        abstract member ActivePlayer : Player
         abstract member EndCondition : FinalState
-        abstract member WinningPlayer : Turn
+        abstract member WinningPlayer : Player
