@@ -85,15 +85,15 @@ module GameLogic =
     let getWinningPlayer state = 
         match state with
         | State.FinalState({EndCondition = EndCondition.Draw}) -> None
-        | State.FinalState({Turn=Player.X}) -> Some(Player.O)
-        | State.FinalState({Turn=Player.O}) -> Some(Player.X)
+        | State.FinalState({Turn=Player.X}) -> Some(Player.X)
+        | State.FinalState({Turn=Player.O}) -> Some(Player.O)
         | _ -> None
 
     let performMove( game:Game )( row:int )( col:int ) =
         if not(isOver game.State) && ( isEmptyCell game.Board row col ) then 
             let desiredCellState = 
                 match game.State  with 
-                | Turn(t) -> flipTurn t
+                | Turn(t) -> t
                 | _ -> raise(NotImplementedException("???"))
 
             let newBoard = Array2D.copy(game.Board)
