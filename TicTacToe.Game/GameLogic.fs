@@ -85,8 +85,8 @@ module GameLogic =
     let getWinningPlayer state = 
         match state with
         | State.FinalState({EndCondition = EndCondition.Draw}) -> None
-        | State.FinalState({Turn=Player.X}) -> Some(Player.X)
-        | State.FinalState({Turn=Player.O}) -> Some(Player.O)
+        | State.FinalState({Turn=Player.X}) -> Some(Player.O)
+        | State.FinalState({Turn=Player.O}) -> Some(Player.X)
         | _ -> None
 
     let performMove( game:Game )( row:int )( col:int ) =
