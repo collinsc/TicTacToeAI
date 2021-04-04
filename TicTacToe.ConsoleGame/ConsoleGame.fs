@@ -9,14 +9,13 @@ module ConsoleGame =
     open MutableState
 
     // processes input & feeds to TicTacToe object
-    type ConsoleGame() as this = 
-        let game = Game(Some(XTurn))
+    type ConsoleGame()  = 
+        let game = Game(Some(Player.X))
         do 
-            printfn "%s" this.BuildGameString
-            // first move is randomized so AI might go first, currently O is ai
-            if game.State = State.Turn(OTurn) then
+            printfn "%s" (game.ToString())            // first move is randomized so AI might go first, currently O is ai
+            if game.State = State.Turn(Player.O) then
                 game.TakeAITurn()
-                printfn "%s" this.BuildGameString
+                printfn "%s" (game.ToString())
 
         member this.InputPrompt = "Enter an index:"
         
@@ -52,10 +51,10 @@ module ConsoleGame =
                     let row, col = indexValue.Value
                     if game.IsEmpty row col then
                         game.TakeTurn row col
-                        printfn "%s" this.BuildGameString
+                        printfn "%s" (game.ToString())
                         if not(game.IsOver) then
                             game.TakeAITurn()
-                            printfn "%s" this.BuildGameString
+                            printfn "%s" (game.ToString())
                             not game.IsOver
                         else 
                             false
@@ -66,43 +65,3 @@ module ConsoleGame =
                 else
                     printfn "Could not parse input %s, expects pair of indexes in row-major order or quit" input
                     true
-
-
-        member this.BuildGameString = 
-        
-            let getCellStr (cell:CellState) =
-                match cell with
-                | CellState.Empty -> " "
-                | CellState.X -> "X"
-                | CellState.O -> "O"
-                | _ -> raise(NotImplementedException("???"))
-        
-            let getDecoratedCell row col cell =
-                match (row, col) with
-                | (0, 2) 
-                | (1, 2) ->   getCellStr(cell) + "\n-----\n" 
-                | (2, 2) -> getCellStr(cell)
-                | (1, _) 
-                | (2, _) 
-                | (0, _) -> getCellStr(cell) + "|"
-                | _ -> raise(NotImplementedException("???"))
-        
-            let getStateStr state = 
-                let getPlayer p =
-                    match p with 
-                    | XTurn -> "X"
-                    | OTurn -> "O"
-                match state with
-                    | State.FinalState({Turn = t; EndCondition = e}) ->
-                        match e with 
-                        | EndCondition.Draw -> sprintf "%s forced draw" (getPlayer t)
-                        | _ -> sprintf "%s won by %O" (getPlayer t) e 
-                    | State.Turn(t)-> sprintf "It's %s's turn" (getPlayer t)
-        
-            let buildStrings = Array2D.mapi(fun r c cell -> getDecoratedCell(r)(c)(cell))
-        
-            let strSeq = buildStrings(game.Board) |> Seq.cast<string>
-        
-            String.Concat(seq { 
-                sprintf "%s\n" (getStateStr game.State)
-                yield! strSeq})

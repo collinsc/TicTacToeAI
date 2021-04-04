@@ -1,14 +1,14 @@
 ﻿namespace TicTacToe.Game
 module GameTypes =
 
-    type CellState = 
-        | Empty = 0
-        | X = 1
-        | O = 2
 
-    type Turn = 
-        | XTurn
-        | OTurn
+    type Player = 
+        | X = 0
+        | O = 1
+
+    type CellState =
+        | Player of Player
+        | Empty
     
 
     type EndCondition = 
@@ -24,13 +24,14 @@ module GameTypes =
     
 
     type FinalState = 
-        { Turn:Turn
+        { Turn:Player
           EndCondition:EndCondition }
 
     
     type State =
-        | Turn of Turn
+        | Turn of Player
         | FinalState of FinalState
+
 
 
     type Game =
@@ -48,6 +49,6 @@ module GameTypes =
         abstract member IsLegal : row:int -> col:int -> bool
         abstract member GetCellState : row:int -> col:int -> CellState
         abstract member IsOver : bool
-        abstract member ActivePlayer : Turn
+        abstract member ActivePlayer : System.Nullable<Player>
         abstract member EndCondition : FinalState
-        abstract member WinningPlayer : Turn
+        abstract member WinningPlayer : System.Nullable<Player>

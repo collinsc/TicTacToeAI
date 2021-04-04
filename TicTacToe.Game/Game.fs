@@ -9,7 +9,7 @@ module MutableState =
 
 
     // Main interface implementation all mutable state is in this object
-    type Game(turn: Turn Option) =
+    type Game(turn: Player Option) =
     
     
         let mutable game = GameLogic.getNewGame(turn)
@@ -36,11 +36,11 @@ module MutableState =
             game.Board
     
         override this.ToString() =
-            let getCellStr (cell:CellState) =
+            let getCellStr cell =
                 match cell with
                 | CellState.Empty -> " "
-                | CellState.X -> "X"
-                | CellState.O -> "O"
+                | CellState.Player(Player.X) -> "X"
+                | CellState.Player(Player.O) -> "O"
                 | _ -> raise(NotImplementedException("???"))
         
             let getDecoratedCell row col cell =
@@ -56,8 +56,9 @@ module MutableState =
             let getStateStr state = 
                 let getPlayer p =
                     match p with 
-                    | XTurn -> "X"
-                    | OTurn -> "O"
+                    | Player.X -> "X"
+                    | Player.O -> "O"
+                    | _ -> raise(NotImplementedException("???"))
                 match state with
                     | State.FinalState({Turn = t; EndCondition = e}) ->
                         match e with 
