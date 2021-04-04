@@ -38,9 +38,9 @@ module MutableState =
         override this.ToString() =
             let getCellStr cell =
                 match cell with
-                | None -> " "
-                | Some(Player.X) -> "X"
-                | Some(Player.O) -> "O"
+                | CellState.Empty -> " "
+                | CellState.Player(Player.X) -> "X"
+                | CellState.Player(Player.O) -> "O"
                 | _ -> raise(NotImplementedException("???"))
         
             let getDecoratedCell row col cell =

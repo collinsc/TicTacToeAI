@@ -14,7 +14,7 @@ module GameLogic =
             Player.O
 
 
-    let isEmpty cell = cell = None
+    let isEmpty cell = cell = CellState.Empty
 
 
     let flipTurn turn = 
@@ -25,7 +25,7 @@ module GameLogic =
 
 
 
-    let isEmptyCell ( board:Player option[,] ) row col = isEmpty board.[row,col]
+    let isEmptyCell ( board:CellState[,] ) row col = isEmpty board.[row,col]
 
     let getNewGame turn = 
         match turn with
@@ -46,7 +46,7 @@ module GameLogic =
         let statesByIndex = Array2D.mapi getStateByIndex board
         let nonEmptyIndexes = 
             statesByIndex 
-            |> Seq.cast<Player option*(int*int)> 
+            |> Seq.cast<CellState*(int*int)> 
             |> Seq.filter(isEmpty) 
             |> Seq.map(getIndex)
         nonEmptyIndexes
@@ -55,8 +55,8 @@ module GameLogic =
     let getMovesRemaining board = getLegalMoves board |> Seq.length
 
 
-    let private computeState (starting:State)(newBoard:Player option[,]) =
-        let check3InARow (a:Player option) b c = not(isEmpty(a)) && b = a && c = a
+    let private computeState (starting:State)(newBoard:CellState[,]) =
+        let check3InARow (a:CellState) b c = not(isEmpty(a)) && b = a && c = a
         let winCondition = 
             match newBoard with 
             | b when check3InARow b.[0, 0] b.[0, 1] b.[0, 2] -> Some(EndCondition.Row1)
@@ -85,8 +85,8 @@ module GameLogic =
     let getWinningPlayer state = 
         match state with
         | State.FinalState({EndCondition = EndCondition.Draw}) -> None
-        | State.FinalState({Turn=Player.X}) -> Some(Player.O)
-        | State.FinalState({Turn=Player.O}) -> Some(Player.X)
+        | State.FinalState({Turn=Player.X}) -> Some(Player.X)
+        | State.FinalState({Turn=Player.O}) -> Some(Player.O)
         | _ -> None
 
     let performMove( game:Game )( row:int )( col:int ) =
@@ -97,7 +97,7 @@ module GameLogic =
                 | _ -> raise(NotImplementedException("???"))
 
             let newBoard = Array2D.copy(game.Board)
-            newBoard.[row,col] <- Some(desiredCellState)
+            newBoard.[row,col] <- CellState.Player(desiredCellState)
             
             let newState = computeState game.State newBoard 
             { State = newState; Board = newBoard }

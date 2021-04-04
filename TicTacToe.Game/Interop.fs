@@ -1,7 +1,8 @@
 ﻿namespace TicTacToe.Game
 
 
-module Interfaces = 
+module Interfaces =
+    open System
     open GameTypes
     open GameLogic
     open MutableState
@@ -12,10 +13,10 @@ module Interfaces =
         let game = Game(turn)
     
         interface IGameService with
-            member this.WinningPlayer: Player = 
+            member this.WinningPlayer: Nullable<Player> = 
                 match getWinningPlayer game.State with
-                | Some(turn) -> turn
-                | _ -> Unchecked.defaultof<_>
+                | Some(turn) -> Nullable(turn)
+                | _ -> System.Nullable()
     
             member this.TakeTurn (row:int) (col:int)= game.TakeTurn row col
     
@@ -25,8 +26,8 @@ module Interfaces =
             
             member this.ActivePlayer =
                 match game.State with
-                | State.Turn t -> t
-                | _ -> Unchecked.defaultof<_>
+                | State.Turn t -> Nullable(t)
+                | _ -> System.Nullable()
     
     
             member this.EndCondition = 
