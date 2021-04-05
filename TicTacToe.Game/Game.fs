@@ -17,12 +17,12 @@ module MutableState =
     
         member this.TakeTurn row col = game <- performMove game row col
     
-        member this.TakeAITurn() = 
-            let row, col = computeAIMove false game
+        member this.TakeAITurn difficulty = 
+            let row, col = computeAIMove false difficulty game
             this.TakeTurn row col
 
-        member this.TakeDeterministicAITurn() = 
-            let row, col = computeAIMove true game
+        member this.TakeDeterministicAITurn difficulty = 
+            let row, col = computeAIMove true difficulty game
             this.TakeTurn row col
             
         member this.IsOver = isOver game.State

@@ -14,7 +14,7 @@ module TestFunctions =
         if log then printfn "%s" (game.ToString())
 
     let takeAITurn (game:Game)= 
-        game.TakeDeterministicAITurn()
+        game.TakeDeterministicAITurn Difficulty.Impossible
         if log then printfn "%s" (game.ToString())
 
     // plays the game, executes a sequence of moves, and asserts end condtion
