@@ -42,10 +42,15 @@ module GameTypes =
             { Board= Array2D.create 3 3 CellState.Empty
               State = State.Turn(turn) }
 
+    type Difficulty =
+        | Easy = 0
+        | Challenging = 1
+        | Impossible = 2
+
 
     type IGameService = 
         abstract member TakeTurn : row:int -> col:int -> unit
-        abstract member TakeAITurn : unit -> unit
+        abstract member TakeAITurn : difficulty:Difficulty -> unit
         abstract member IsLegal : row:int -> col:int -> bool
         abstract member GetCellState : row:int -> col:int -> CellState
         abstract member IsOver : bool

@@ -20,7 +20,7 @@ module Interfaces =
     
             member this.TakeTurn (row:int) (col:int)= game.TakeTurn row col
     
-            member this.TakeAITurn() = game.TakeAITurn()
+            member this.TakeAITurn(difficulty:Difficulty) = game.TakeAITurn(difficulty)
     
             member this.IsLegal(row:int) (col:int) : bool = game.IsEmpty row col
             

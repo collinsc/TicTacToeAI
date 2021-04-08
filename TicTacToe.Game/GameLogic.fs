@@ -128,30 +128,43 @@ module GameLogic =
     
 
     
-    let computeAIMove isDeterministic game =
+    let computeAIMove isDeterministic difficulty game =
 
         let corners = [| (0, 0); (0, 2); (2, 0); (2, 2) |]
         
         let computeAIOpeningMove() = 
-            corners.[System.Random().Next(0, 4)]
+            if isDeterministic then
+                (0, 0)
+            else
+                match difficulty with
+                | Difficulty.Impossible -> corners.[System.Random().Next(0, 4)]
+                | _ -> (System.Random().Next(0, 3),System.Random().Next(0, 3))
         
         let isCornerFilled() =
             let checkCorner(row,col) = not(isEmptyCell game.Board row col)
             match Array.tryFind checkCorner corners with
             | Some(_) -> true
             | _ -> false
+
+        let getLookahead =
+            match difficulty with
+            | Difficulty.Easy -> 2
+            | Difficulty.Challenging -> 4
+            | Difficulty.Impossible -> getMovesRemaining game.Board
+            | _ -> raise (NotImplementedException "???")
+
+        let ComputeMove() = 
+            let initialData = ABSearchData<Game,int*int>.Default ( getLookahead ) game
+            let result = ABPruningAI.ComputeSearch initialData aiGame
+            result.NextMove.Value
             
         
         // Tic Tac Toe is a solved game so we already know the best opening + response
         let movesRemaining = getLegalMoves game.Board |> Seq.length
+        let isImpossible = difficulty = Difficulty.Impossible
+
         match movesRemaining with
-        | 9 -> 
-            if isDeterministic then // best opening is corner square
-                (0, 0)
-            else 
-                computeAIOpeningMove()
-        | 8 when isCornerFilled()  -> (1, 1) // best response is center
+        | 9 -> computeAIOpeningMove()
+        | 8 when isImpossible && isCornerFilled()  -> (1, 1) // best response is center
         | _ -> 
-            let initialData = ABSearchData<Game,int*int>.Default ( getMovesRemaining game.Board ) game
-            let result = ABPruningAI.ComputeSearch initialData aiGame
-            result.NextMove.Value
+            ComputeMove()

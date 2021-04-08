@@ -14,7 +14,7 @@ module ConsoleGame =
         do 
             printfn "%s" (game.ToString())            // first move is randomized so AI might go first, currently O is ai
             if game.State = State.Turn(Player.O) then
-                game.TakeAITurn()
+                game.TakeAITurn Difficulty.Impossible
                 printfn "%s" (game.ToString())
 
         member this.InputPrompt = "Enter an index:"
@@ -53,7 +53,7 @@ module ConsoleGame =
                         game.TakeTurn row col
                         printfn "%s" (game.ToString())
                         if not(game.IsOver) then
-                            game.TakeAITurn()
+                            game.TakeAITurn Difficulty.Impossible
                             printfn "%s" (game.ToString())
                             not game.IsOver
                         else 
