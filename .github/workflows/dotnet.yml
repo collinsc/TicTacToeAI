@@ -35,16 +35,16 @@ jobs:
         gist_badge_label: 'TicTacToe.Game.Tests : %Counters_passed%/%Counters_total%'
         gist_token: ${{ secrets.GIST_TOKEN }}
     - name: Push test results
-        shell: pwsh
-        run: |
-          Write-ActionInfo '  MSTest:'
-          Write-ActionInfo '    * result_value    = ${{ steps.testAction3c.outputs.result_value }}'
-          Write-ActionInfo '    * total_count     = ${{ steps.testAction3c.outputs.total_count }}'
-          Write-ActionInfo '    * passed_count    = ${{ steps.testAction3c.outputs.passed_count }}'
-          Write-ActionInfo '    * failed_count    = ${{ steps.testAction3c.outputs.failed_count }}'
-          Write-ActionInfo '    * gist_report_url = ${{ steps.testAction3c.outputs.gist_report_url }}'
-          Write-ActionInfo '    * gist_badge_url  = ${{ steps.testAction3c.outputs.gist_badge_url }}'
-          Write-ActionInfo ''
+      shell: pwsh
+      run: |
+        Write-ActionInfo '  MSTest:'
+        Write-ActionInfo '    * result_value    = ${{ steps.testAction3c.outputs.result_value }}'
+        Write-ActionInfo '    * total_count     = ${{ steps.testAction3c.outputs.total_count }}'
+        Write-ActionInfo '    * passed_count    = ${{ steps.testAction3c.outputs.passed_count }}'
+        Write-ActionInfo '    * failed_count    = ${{ steps.testAction3c.outputs.failed_count }}'
+        Write-ActionInfo '    * gist_report_url = ${{ steps.testAction3c.outputs.gist_report_url }}'
+        Write-ActionInfo '    * gist_badge_url  = ${{ steps.testAction3c.outputs.gist_badge_url }}'
+        Write-ActionInfo ''
 
   loc_badge_job:
     runs-on: windows-latest
