@@ -24,6 +24,7 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Tests
+      id: testAction
       uses: zyborg/dotnet-tests-report@v1
       with:
         project_path: TicTacToe.Game.Tests
@@ -38,12 +39,12 @@ jobs:
       shell: pwsh
       run: |
         Write-ActionInfo '  MSTest:'
-        Write-ActionInfo '    * result_value    = ${{ steps.testAction3c.outputs.result_value }}'
-        Write-ActionInfo '    * total_count     = ${{ steps.testAction3c.outputs.total_count }}'
-        Write-ActionInfo '    * passed_count    = ${{ steps.testAction3c.outputs.passed_count }}'
-        Write-ActionInfo '    * failed_count    = ${{ steps.testAction3c.outputs.failed_count }}'
-        Write-ActionInfo '    * gist_report_url = ${{ steps.testAction3c.outputs.gist_report_url }}'
-        Write-ActionInfo '    * gist_badge_url  = ${{ steps.testAction3c.outputs.gist_badge_url }}'
+        Write-ActionInfo '    * result_value    = ${{ steps.testAction.outputs.result_value }}'
+        Write-ActionInfo '    * total_count     = ${{ steps.testAction.outputs.total_count }}'
+        Write-ActionInfo '    * passed_count    = ${{ steps.testAction.outputs.passed_count }}'
+        Write-ActionInfo '    * failed_count    = ${{ steps.testAction.outputs.failed_count }}'        
+        Write-ActionInfo '    * gist_report_url = ${{ steps.testAction.outputs.gist_report_url }}'
+        Write-ActionInfo '    * gist_badge_url  = ${{ steps.testAction.outputs.gist_badge_url }}'
         Write-ActionInfo ''
 
   loc_badge_job:
