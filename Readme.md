@@ -12,5 +12,7 @@ Integrates with my [WPF game](https://github.com/collinsc/TicTacToe).
 - __TicTacToe.Tests:__ Test game states, win conditions, and AI function
 - __TicTacToe.ConsoleGame:__ Console utility for testing
 
+![Generated Button](https://raw.githubusercontent.com/collinsc/TicTacToe/image-data/badge.svg)
+
 ---
 _Created and published by Collin Conway in 2021 under the MIT license_
