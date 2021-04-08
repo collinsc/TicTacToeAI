@@ -3,12 +3,14 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <AssemblyName>TicTacToeGame</AssemblyName>
+    <AssemblyName>TicTacToe.Game</AssemblyName>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Collin Conway</Authors>
     <Company />
     <Product />
+    <PackageProjectUrl>https://github.com/collinsc/TicTacToeAI</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/collinsc/TicTacToeAI</RepositoryUrl>
     
   </PropertyGroup>
 
