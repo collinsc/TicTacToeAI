@@ -3,13 +3,18 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <AssemblyName>TicTacToeGame</AssemblyName>
+    <AssemblyName>TicTacToe.Game</AssemblyName>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Collin Conway</Authors>
     <Company />
     <Product />
-    
+    <PackageProjectUrl>https://github.com/collinsc/TicTacToeAI</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/collinsc/TicTacToeAI</RepositoryUrl>
+    <OutputType>dll</OutputType>
+    <PackageId>TicTacToe.Game</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Collin</Authors>
+    <PackageDescription>TicTacToe game with MinMax AB Pruning ai.</PackageDescription>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
